@@ -77,6 +77,8 @@ You will be asked to accept the host key of the bastion server (this is so that 
 
 It can take up to 30 minutes to deploy. If this fails with an `ansible` not found error, just run it again.
 
+When running this initially, the post-install scripts failed, and I had to run them manually. To do that just ssh into each machine (master or node) and manually run the commands from the post-install scripts. The admin password is set in the master post install script. If you don't change it, it'll be '123'. You can also log into the master after the fact and update the passwords manually using htpasswd. See this link for more information: https://docs.openshift.org/latest/install_config/configuring_authentication.html#HTPasswdPasswordIdentityProvider
+
 Once the setup is complete, just run:
 
 ```bash
