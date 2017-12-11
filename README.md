@@ -39,6 +39,12 @@ Create the infrastructure first:
 # Make sure ssh agent is on, you'll need it later.
 eval `ssh-agent -s`
 
+# You may also need to do the following if you just installed terraform
+terraform init
+
+# And if you don't have an RSA keypair setup for ssh (replace <YOUR_USERNAME> with something like 'chris.marth')
+ssh-keygen -t rsa -C "<YOUR_USERNAME>@pinksummit.com"
+
 # Create the infrastructure.
 make infrastructure
 ```
