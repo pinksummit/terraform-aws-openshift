@@ -22,6 +22,19 @@ openshift:
 	cat ./scripts/postinstall-node.sh | ssh -A ec2-user@$$(terraform output bastion-public_dns) ssh node1.openshift.local
 	cat ./scripts/postinstall-node.sh | ssh -A ec2-user@$$(terraform output bastion-public_dns) ssh node2.openshift.local
 
+# Uninstalls OpenShift from the cluster - assumes that the inventory file and playbooks are already on the Bastion
+openshift-uninstall:
+	# Add our identity for ssh, add the host key to avoid having to accept the
+	# the host key manually. Also add the identity of each node to the bastion.
+	ssh-add ~/.ssh/id_rsa
+	ssh-keyscan -t rsa -H $$(terraform output bastion-public_dns) >> ~/.ssh/known_hosts
+	ssh -A ec2-user@$$(terraform output bastion-public_dns) "ssh-keyscan -t rsa -H master.openshift.local >> ~/.ssh/known_hosts"
+	ssh -A ec2-user@$$(terraform output bastion-public_dns) "ssh-keyscan -t rsa -H node1.openshift.local >> ~/.ssh/known_hosts"
+	ssh -A ec2-user@$$(terraform output bastion-public_dns) "ssh-keyscan -t rsa -H node2.openshift.local >> ~/.ssh/known_hosts"
+
+	# Create our inventory, copy to the master and run the install script.
+	cat uninstall-from-bastion.sh | ssh -o StrictHostKeyChecking=no -A ec2-user@$$(terraform output bastion-public_dns)
+
 # Open the console.
 browse-openshift:
 	open $$(terraform output master-url)
