@@ -13,7 +13,10 @@ openshift:
 	ssh -A ec2-user@$$(terraform output bastion-public_dns) "ssh-keyscan -t rsa -H node2.openshift.local >> ~/.ssh/known_hosts"
 
 	# Create our inventory, copy to the master and run the install script.
-	sed "s/\$${aws_instance.master.public_ip}/$$(terraform output master-public_ip)/" inventory.template.cfg > inventory.cfg
+	sed "s/\$${aws_instance.master.public_ip}/$$(terraform output master-public_ip)/g" inventory.template.cfg > inventory.cfg
+	sed -i "s/\$${aws_instance.master.private_dns}/$$(terraform output master-private_dns)/g" inventory.cfg 
+	sed -i "s/\$${aws_instance.node1.private_dns}/$$(terraform output node1-private_dns)/g" inventory.cfg 
+	sed -i "s/\$${aws_instance.node2.private_dns}/$$(terraform output node2-private_dns)/g" inventory.cfg 
 	scp ./inventory.cfg ec2-user@$$(terraform output bastion-public_dns):~
 	cat install-from-bastion.sh | ssh -o StrictHostKeyChecking=no -A ec2-user@$$(terraform output bastion-public_dns)
 
